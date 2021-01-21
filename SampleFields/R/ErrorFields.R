@@ -9,13 +9,13 @@
 #   - MASS
 #
 # Contained functions:
+#   - ArbCovNoise (rdy)
 #   - SinCosSumNoise
 #   - GaussDensitySumNoise
 #   - OUNoise
 #   - DegrasNonGaussNoise
 #   - BernsteinSumNoise
 #   - HermiteSumNoise
-#   - ArbCovNoise
 #   - SquaredExp2DNoise
 #   - GaussDensitySum2DNoise
 #
@@ -24,6 +24,62 @@
 # - Style guideline NOT included
 #------------------------------------------------------------------------------#
 
+#' Samples from a process having a given covariance structure
+#'
+#' Creates sample paths from a 1D random field having an arbitrary covariance
+#' function. The standard is given by the square exponential function:
+#'  C(h)=exp( -h^2/(4*nu^2) )
+#' @param N Integer amount of realisations of the random field to be generated.
+#' @param x Vector locations at which the random field is evaluated.
+#' @param cov.fun vectorized function which computes the covariance between two
+#' points in the vector x.
+#' @param ... additional arguments to cov.fun
+#' @return Matrix containing the realisations of the random field as columns. The rows are the locations.
+#'
+#' @export
+ArbCovProcess <- function( N,
+                           x = seq( 0, 1, length.out = 100 ),
+                           covf = covf.SquareExp, ...
+){
+  # Get the covariance matrix
+  Sigma = outer( x, x, FUN = Vectorize( function( y, z ) covf( y, z, ... ) ) )
+
+  # Simulate realizations from the Gaussian process with the given covariance
+  # function
+  Y = t( MASS::mvrnorm( N, mu = rep( 0, length( x ) ),
+         Sigma = Sigma ) )
+}
+
+
+#' Samples from Random Linear Combination of given functions
+#'
+#' Creates sample paths from a 1D random field generated as a random sum ofthe first seven Bernstein polynomials.
+#' @param N Integer amount of realisations of the random field to be generated.
+#' @param x Vector locations at which the random field is evaluated.
+#' @param sigma Function computing the pointwise variance of the field. Default value is unit variance everywhere.
+#' @param randNumber Function generating a vector of random numbers with mean zero and variance 1. Default is rnorm().
+#' @return Matrix containing the realisations of the random field as columns. The rows are the locations.
+#' @export
+RandomLinearSum <- function( N,
+                               x          = seq( 0, 1, length.out = 100 ),
+                               sigma      = function( x ){ 1 },
+                               randNumber = rnorm ){
+
+  f <- cbind( ( 1 - x )^6,
+              6 * x * ( 1 - x )^5,
+              15 * x^2 * ( 1 - x )^4,
+              20 * x^3 * ( 1 - x )^3,
+              15 * x^4 * ( 1 - x )^2,
+              6 * x^5 * ( 1 - x ),
+              x^6 )
+  fSqSum <- apply( f^2, 1, sum )
+  fNorm <- f / sqrt( fSqSum )
+  nBasis <- dim(f)[2]
+  return( fNorm %*% matrix( randNumber( nBasis * N), nBasis, N ) * sigma(x) )
+}
+
+#' Samples from the Cosine Field
+#'
 #' Creates sample paths from a 1D Gaussian fields generated as a random sum of sine and cosine functions with frequency pi/2 and standard Gaussians as coefficients.
 #' @param N Integer amount of realisations of the random field to be generated.
 #' @param x Vector locations at which the random field is evaluated.
@@ -32,12 +88,14 @@
 #' @export
 SinCosSumNoise <- function( N,
                             x     = seq( 0, 1, length.out = 100 ),
-                            sigma = function(x){ 1 } ){
+                            sigma = function( x ){ 1 } ){
 
-  return( ( sin( pi/2 * x ) %*% t(rnorm( N, 0, 1 ) ) +
-              cos( pi/2 * x ) %*% t(rnorm( N, 0, 1 ) ) ) * sigma(x) )
+  return( ( sin( pi/2 * x ) %*% t( rnorm( N, 0, 1 ) ) +
+              cos( pi/2 * x ) %*% t( rnorm( N, 0, 1 ) ) ) * sigma(x) )
 }
 
+#' Samples from Random Linear Combination of Gaussian Densities
+#'
 #' Creates sample paths from a 1D field generated as a random sum of Gaussian densities with different means and variances and random coefficients.
 #' @param N Integer amount of realisations of the random field to be generated.
 #' @param x Vector locations at which the random field is evaluated.
@@ -65,9 +123,13 @@ GaussDensitySumNoise <- function( N,
                                  sd=anchorSd[pt]))
   fSqSum <- apply(f^2, 1, sum)
   fNorm <- f / sqrt(fSqSum)
-  return( (fNorm %*% matrix(randNumber(nAnchorPoints * N), nAnchorPoints, N)) * sigma(x) )
+  return( (fNorm %*% matrix( randNumber( nAnchorPoints * N ),
+                             nAnchorPoints,
+                             N ) ) * sigma(x) )
 }
 
+#' Samples from Ornstein-Uhlenbeck process
+#'
 #' Creates sample paths from a 1D Ornstein Uhlenbeck process.
 #' @param N Integer amount of realisations of the random field to be generated.
 #' @param x Vector locations at which the random field is evaluated.
@@ -105,6 +167,9 @@ OUNoise <- function( N,
   return( Y * sigma(x) )
 }
 
+
+#' Samples from a Non-Gaussian process used in Degras(2011)
+#'
 #' Creates sample paths from a 1D non Gaussian field as used in Degras (2011, Simultaneous confidence bands for nonparametric regression with functional data. Statistica Sinica, 1735-1765.).
 #' @param N Integer amount of realisations of the random field to be generated.
 #' @param x Vector locations at which the random field is evaluated.
@@ -123,6 +188,9 @@ DegrasNonGaussNoise <- function( N,
           FUN.VALUE = rep( 0, length( x ) ) ) * sigma( x )
 }
 
+
+#' Samples from Random Linear Combination of Bernstein Polynomials
+#'
 #' Creates sample paths from a 1D random field generated as a random sum ofthe first seven Bernstein polynomials.
 #' @param N Integer amount of realisations of the random field to be generated.
 #' @param x Vector locations at which the random field is evaluated.
@@ -148,6 +216,8 @@ BernsteinSumNoise <- function( N,
   return( fNorm %*% matrix( randNumber( nBasis * N), nBasis, N ) * sigma(x) )
 }
 
+#' Samples from Random Linear Combination of Hermite Polynomials
+#'
 #' Creates sample paths from a 1D random field generated as a random sum of the first five Hermite polynomials.
 #' @param N Integer amount of realisations of the random field to be generated.
 #' @param x Vector locations at which the random field is evaluated.
@@ -172,23 +242,8 @@ HermiteSumNoise <- function( N,
   return( fNorm %*% matrix( rnorm( nBasis * N), nBasis, N ) * sigma(x) )
 }
 
-#'Creates sample paths from a 1D random field having an arbitrary covariance function. The standard is given by the square exponential function: C(h)=exp( -h^2/(4*nu^2) )
-#' @param N Integer amount of realisations of the random field to be generated.
-#' @param x Vector locations at which the random field is evaluated.
-#' @param sigma Function computing the pointwise variance of the field. Default value is unit variance everywhere.
-#' @param CovFun Function taking to arguments, which computes the desired covariance.
-#' @return Matrix containing the realisations of the random field as columns. The rows are the locations.
+#' Samples from the Stationary process with the SquaredExp covariance function
 #'
-#' @export
-ArbCovNoise <- function( N,
-                         x      = seq( 0, 1, length.out = 100 ),
-                         sigma  = function( x ){ 1 },
-                         CovFun = function( x, y ){ exp( -( x - y )^2 / 4 / 4^2 ) }
-){
-
-  Y = t(MASS::mvrnorm( N, mu=rep(0,length(x)), Sigma=outer( x, x, FUN = CovFun ) ))* sigma(x)
-}
-
 #'Creates sample paths from a 1D random field having an arbitrary covariance function. The standard is given by the square exponential function: C(h)=exp( -h^2/(4*nu^2) )
 #' @param N Integer amount of realisations of the random field to be generated.
 #' @param x Vector locations at which the random field is evaluated.
@@ -208,6 +263,8 @@ SquaredExp1DNoise <- function( N,
   Y = t(MASS::mvrnorm( N, mu=rep(0,length(x)), Sigma=outer( x, x, FUN = CovFun ) ))* sigma(x)
 }
 
+#' Samples from Random Linear Combination of Gaussian Densities
+#'
 #'Creates a sample from an Gaussian isotropic 2D random field having a square exponential function: C(h)=exp( -h^2/(4*nu^2) ) as covariance structure by smoothing independent noise with a Gaussian kernel.
 #' @param N Integer amount of realisations of the random field to be generated.
 #' @param x Vector locations at which the random field is evaluated.
