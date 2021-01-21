@@ -5,6 +5,7 @@
 #                                                                              #
 #------------------------------------------------------------------------------#
 # Contained functions:
+#  - covf.square.exp
 #  - covf.nonst.matern
 #
 #------------------------------------------------------------------------------#
@@ -12,21 +13,24 @@
 # - Style guideline included
 #------------------------------------------------------------------------------#
 
-#' Modified Matern Covariance Function (varying roughness parameter)
+#' Covariance function: Square exponential
 #'
-#' @param x1 First argument of cov(x1,x2). Caution: It is assumed that 0<=x1<=1.
-#' @param x2 Second argument of cov(x1,x2). Caution: It is assumed that 0<=x2<=1.
-#' @param params Covariance function parameters: params=c(nu1, nu2, sigma).
+#' This implements the square exponential covariance function, i.e.,
+#' *insert formula*
+#'
+#' @param x First argument of cov(x1,x2).
+#' @param y Second argument of cov(x1,x2).
+#' @param h bandwidth in
 #' @export
-covf.SquareExp <- function( x, y, h = 0.01 ){
+covf.square.exp <- function( x, y, h = 0.01 ){
   exp( -( x - y )^2 / 4 / h^2 )
 }
 
 
 #' Modified Matern Covariance Function (varying roughness parameter)
 #'
-#' @param x1 First argument of cov(x1,x2). Caution: It is assumed that 0<=x1<=1.
-#' @param x2 Second argument of cov(x1,x2). Caution: It is assumed that 0<=x2<=1.
+#' @param x First argument of cov(x,y). Caution: It is assumed that 0<=x1<=1.
+#' @param y Second argument of cov(x,y). Caution: It is assumed that 0<=x2<=1.
 #' @param params Covariance function parameters: params=c(nu1, nu2, sigma).
 #' @export
 covf.nonst.matern <- function( x,
