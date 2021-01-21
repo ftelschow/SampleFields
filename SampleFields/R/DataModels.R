@@ -4,31 +4,33 @@
 #                                                                              #
 #------------------------------------------------------------------------------#
 # Required packages:
-#   - abind
-#   - spatstat
-#   - MASS
 #
 # Contained functions:
 #   - SignalPlusNoise
 #
 #------------------------------------------------------------------------------#
 # Developer notes:
-# - Style guideline NOT included
+# - Style guideline included
+# - write documentation, especially figure out how to get formulas
 #------------------------------------------------------------------------------#
 
 #' Generate samples from signal-plus-noise model
 #'
 #' This function generates samples from a signal-plus-noise model
+#' $$ Y = \mu(s) + \sigma(s) Z(s) $$
 #' *insert formula*
 #' The population mean, variance, error field and observation noise can be
 #' seperately defined as functions or predefined functions from this package
 #' can be used.
 #' @param N Integer amount of realisations of the random field to be generated.
-#' @param x Vector/Array locations at which the random field is evaluated. Must be a valid input for the functions 'mu', 'noise' and 'sigma'.
-#' @param mu Function computing the population mean of the signal plus noise model from a vector of locations.
+#' @param x Vector/Array locations at which the random field is evaluated.
+#' Must be a valid input for the functions 'mu', 'noise' and 'sigma'.
+#' @param mu Function computing the population mean of the signal plus noise
+#' model from a vector of locations.
 #' @param noise Function computing a sample of random fields.
 #' @param sigma Function computing the mean from a vector.
-#' @param sd_ObsNoise Numeric positiv real number giving the standard deviation for independent additiv Gaussian observation noise.
+#' @param sd_ObsNoise Numeric positiv real number giving the standard deviation
+#' for independent additiv Gaussian observation noise.
 #' @param ... additional parameters for the 'noise' function
 #'
 #' @export
