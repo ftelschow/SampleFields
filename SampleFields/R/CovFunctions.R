@@ -1,7 +1,6 @@
 #------------------------------------------------------------------------------#
 #                                                                              #
-#     Different covariance functions to be included in generation of           #
-#     functional data samples                                                  #
+#     Different covariance functions of Random Processes                       #
 #                                                                              #
 #------------------------------------------------------------------------------#
 # Contained functions:
@@ -10,17 +9,20 @@
 #
 #------------------------------------------------------------------------------#
 # Developer notes:
-# - Style guideline included
+# - add the descriptions
 #------------------------------------------------------------------------------#
 
 #' Covariance function: Square exponential
 #'
 #' This implements the square exponential covariance function, i.e.,
-#' *insert formula*
+#' *c( x, y ) = exp( -( x - y )^2 / 4 / h^2 )*
 #'
-#' @param x First argument of cov(x1,x2).
-#' @param y Second argument of cov(x1,x2).
-#' @param h bandwidth in
+#' @param x Numeric. First argument of cov( x, y ).
+#' @param y Numeric. First argument of cov( x, y ).
+#' @param h Numeric. Scaling parameter.
+#'
+#' @return Value of the covariance function evaluated at (x, y).
+#'
 #' @export
 covf.square.exp <- function( x, y, h = 0.01 ){
   exp( -( x - y )^2 / 4 / h^2 )
@@ -29,9 +31,14 @@ covf.square.exp <- function( x, y, h = 0.01 ){
 
 #' Modified Matern Covariance Function (varying roughness parameter)
 #'
-#' @param x First argument of cov(x,y). Caution: It is assumed that 0<=x1<=1.
-#' @param y Second argument of cov(x,y). Caution: It is assumed that 0<=x2<=1.
-#' @param params Covariance function parameters: params=c(nu1, nu2, sigma).
+#' This implements the square exponential covariance function, i.e.,
+#' *c( x, y ) = exp( -( x - y )^2 / 4 / h^2 )*
+#'
+#' @inheritParams covf.square.exp
+#' @inherit covf.square.exp return
+#'
+#' @param params Vector with 3 elements: c(nu1, nu2, sigma).
+#'
 #' @export
 covf.nonst.matern <- function( x,
                                y,

@@ -6,10 +6,11 @@
 # Required packages:
 #
 # Contained functions:
-#
+# - mu.example1.1d
+# - mu.prod
 #------------------------------------------------------------------------------#
 # Developer notes:
-# - Style guideline NOT included
+# - need update of documentation
 #------------------------------------------------------------------------------#
 
 #' Example mean function in 1D
@@ -18,11 +19,14 @@
 #' *insert formula*
 #' and is used in Telschow & Schwartzman(2021).
 #'
-#' @param x Integer amount of realisations of the random field to be generated.
-#' @return Array containing the realisations of the random field.
+#' @inheritParams ArbCovProcess
+#' @inherit ArbCovProcess return
 #'
 #' @export
 mu.example1.1d <- function( x = seq( 0, 1, length.out = 100 ) ){
+  if( !is.null( dim( x ) ) ){
+    break( "For this function x must be a vector." )
+  }
   sin( 8 * pi * x ) * exp( -3 * x )
 }
 
@@ -33,18 +37,14 @@ mu.example1.1d <- function( x = seq( 0, 1, length.out = 100 ) ){
 #' and is used in Telschow & Schwartzman(2021).
 #'
 #' @param x Integer amount of realisations of the random field to be generated.
-#' @param h Vector locations at which the random field is evaluated.
+#'
 #' @return Array containing the realisations of the random field.
 #'
 #' @export
-mu.prod.2d <- function( x = seq( 0, 1, length.out = 100 ), y = NULL ){
-
-  # use the x-values as y-values if nothing else specified
-  if( is.null(y) ){
-    y = x
-  }
+mu.prod <- function( x = expand.grid( seq( 0, 1, length.out = 50 ),
+                                      seq( 0, 1, length.out = 50 ) ) ){
 
   # Compute the mean function
-  outer(x,x, FUN = "*" )
+  apply( x, 1, function( y ) prod( y ) )
 
 }

@@ -6,10 +6,11 @@
 # Required packages:
 #
 # Contained functions:
+# - rnorm.mod
 #
 #------------------------------------------------------------------------------#
 # Developer notes:
-# - Style guideline NOT included
+# - need documention
 #------------------------------------------------------------------------------#
 
 #' Example mean function in 1D
@@ -18,10 +19,13 @@
 #' *insert formula*
 #' and is used in Telschow & Schwartzman(2021).
 #'
-#' @param x Integer amount of realisations of the random field to be generated.
-#' @return Array containing the realisations of the random field.
+#' @param K Integer: output number of rows.
+#' @param N Integer: output number of columns.
+#'
+#' @return Matrix of dimension K x N containing standard normal random
+#'  variables.
 #'
 #' @export
-rnorm.mod <- function( k, N ){
-  return( rnorm( k * N, k, N ) )
+rnorm.mod <- function( K, N ){
+  return( matrix( rnorm( K * N ), K, N ) )
 }

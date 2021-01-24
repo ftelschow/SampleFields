@@ -8,15 +8,18 @@
 #   - MASS
 #
 # Contained functions:
-#   - ArbCovNoise (rdy)
-#   - SinCosSumNoise
-#   - GaussDensitySumNoise
-#   - OUNoise
-#   - DegrasNonGaussNoise
-#   - BernsteinSumNoise
-#   - HermiteSumNoise
+#   - ArbCovProcess
+#   - DegrasNonGaussProcess
+#   - OUProcess
+#
+#   - RandomBasisSum
+#   - RandomBernsteinSum
+#   - RandomHermiteSum
+#   - RandomNormalSum
 #   - SquaredExp2DNoise
 #   - GaussDensitySum2DNoise
+#   - CosineField
+#   - KernelSmoothedField
 #
 #------------------------------------------------------------------------------#
 # Developer notes:
@@ -28,6 +31,7 @@
 #------------------------------------------------------------------------------#
 # Definitions of 1D processes ( x only vector valued )
 #------------------------------------------------------------------------------#
+
 #' Samples from a process having a pre-defined covariance structure
 #'
 #' Creates sample paths from a 1D random field having an arbitrary covariance
@@ -36,9 +40,9 @@
 #'
 #' @param N Integer amount of realisations of the random field to be generated.
 #' @param x Vector locations at which the random process is evaluated.
-#' @param cov.fun vectorized function which computes the covariance between two
-#' points in the vector x.
-#' @param ... additional arguments to cov.fun
+#' @param covf Function computing the covariance between two points in the
+#' vector x.
+#' @param ... additional arguments to covf
 #' @return RandomField class object containing the realisations of the random
 #' field and the locations.
 #'
@@ -72,9 +76,9 @@ ArbCovProcess <- function( N,
 #' @inherit ArbCovProcess return
 #'
 #' @export
-DegrasNonGaussProcess <- function( N, x = seq( 0, 1, length.out = 100) ){
+DegrasNonGaussProcess <- function( N, x = seq( 0, 1, length.out = 100 ) ){
 
-  rcoeff <- cbind( rchisq(N, 1, ncp = 0), rexp(N) )
+  rcoeff <- cbind( rchisq( N, 1, ncp = 0 ), rexp( N ) )
 
   samp.field = vapply( 1:N,
                        function( l ){ sqrt( 2 ) / 6 * ( rcoeff[ l, 1 ] - 1 ) *
@@ -99,37 +103,41 @@ DegrasNonGaussProcess <- function( N, x = seq( 0, 1, length.out = 100) ){
 #' @inheritParams ArbCovProcess
 #' @inherit ArbCovProcess return
 #'
-#' @param alphaOU Numeric value of the retraction parameter in an OU process. Default is 5.
-#' @param sigmaOU Numeric value of the sigma parameter in an OU process. Default is sqrt(10).
+#' @param alpha Numeric value of the retraction parameter in an OU process. Default is 5.
+#' @param sigma Numeric value of the sigma parameter in an OU process. Default is sqrt(10).
 #' @param gamma Vector of the same length as x giving the mean of the OU process.
-#' @return RandomField class object containing the realisations of the random
-#' field and the locations.
+#'
 #' @export
 OUProcess <- function( N,
                        x       = seq( 0, 1, length.out = 100 ),
-                       alphaOU = 5,
-                       sigmaOU = sqrt( 10 ),
-                       gamma   = NULL ){
-  ## Initialize matrix containing as rows a path of the process
-  Y  = matrix( NA, length(x), N )
+                       alpha = 5,
+                       sigma = sqrt( 10 ) ){
 
-  ## Mean Curve vector
-  if( is.null( gamma ) ){
-    gamma <- rep( 0, length( x ) )
-  }
+  # Initialize matrix containing as columns a path of the process
+  Y = matrix( NA, length( x ), N )
 
-  ## Get starting values
-  Y[1,] <- rnorm(N, mean = 0, sd = sigmaOU / sqrt( 2*alphaOU )) + gamma[1]
+  # Get starting values
+  Y[ 1, ] <- rnorm( N, mean = 0, sd = sigma / sqrt( 2*alpha ) )
 
-  ## Compute the Ornstein-Uhlenbeck trajectory
-  for (n in 2:length(x) ){
-    dt <- x[n]-x[n-1]
-    Y[n,] <- vapply( Y[n-1,], function(y) rnorm(1, mean = (y - gamma[n-1])
-                                                * exp(-alphaOU * dt) + gamma[n], sd = sigmaOU
-                                                * sqrt((1 - exp(-2 * alphaOU * dt)) / 2 / alphaOU) )
+  # Compute the Ornstein-Uhlenbeck sample path
+  for( n in 2:length( x ) ){
+    dt <- x[ n ] - x[ n - 1 ]
+    Y[ n, ] <- vapply( Y[ n - 1, ],
+                       function( y ){
+                         rnorm( 1,
+                                mean = ( y - gamma[ n - 1 ] ) * exp( -alpha * dt),
+                                sd   = sigma * sqrt( (1 - exp( -2 * alpha * dt ) ) / 2 / alpha )
+                                )
+                       }
                      , FUN.VALUE=1)
   }
-  return( Y )
+
+  # Create the output class object
+  samp.field = list( values = Y,
+                     locations = x )
+  class( samp.field ) = "RandomField"
+
+  return( samp.field )
 }
 
 
@@ -144,6 +152,7 @@ OUProcess <- function( N,
 #'
 #' @inheritParams ArbCovProcess
 #' @inherit ArbCovProcess return
+#'
 #' @param x Vector or matrix of dimension T x D, where T is the amount of
 #' locations and D the dimension of the domain, defining the coordinates of
 #' the locations at which the random field is evaluated.
@@ -189,10 +198,10 @@ RandomBasisSum <- function( N,
 #' @inherit RandomBasisSum return
 #'
 #' @export
-BernsteinSumNoise <- function( N,
-                               x = seq( 0, 1, length.out = 100 ),
-                               randf = rnorm.mod,
-                               normalize = TRUE ){
+RandomBernsteinSum <- function( N,
+                                x = seq( 0, 1, length.out = 100 ),
+                                randf = rnorm.mod,
+                                normalize = TRUE ){
 
   # define the basis functions as Bernstein polynomials
   basisf <- function(x){ cbind( ( 1 - x )^6,
@@ -222,10 +231,10 @@ BernsteinSumNoise <- function( N,
 #' @inherit RandomBasisSum return
 #'
 #' @export
-HermiteSumNoise <- function( N,
-                             x = seq( 0, 1, length.out = 100 ),
-                             randf = rnorm.mod,
-                             normalize = TRUE ){
+RandomHermiteSum <- function( N,
+                              x = seq( 0, 1, length.out = 100 ),
+                              randf = rnorm.mod,
+                              normalize = TRUE ){
 
   # define the basis functions as Hermite polynomials
   basisf <- function( x ){ cbind( 1,
@@ -251,6 +260,7 @@ HermiteSumNoise <- function( N,
 #'
 #' @inheritParams RandomBasisSum
 #' @inherit RandomBasisSum return
+#'
 #' @param means Matrix of dimension K x D indicating the mean locations of the
 #' K multivariate Gaussian densities used as the basis functions.
 #' @param sigmas Matrix of dimension K x D*D containing the covariance matrix
@@ -258,12 +268,12 @@ HermiteSumNoise <- function( N,
 #' the k-th kernel.
 #'
 #' @export
-RandomNormalSumField <- function( N,
-                                  x = seq( 0, 1, length.out = 100 ),
-                                  randf = rnorm.mod,
-                                  means = NULL,
-                                  sigmas = NULL,
-                                  normalize = TRUE ){
+RandomNormalSum <- function( N,
+                             x = seq( 0, 1, length.out = 100 ),
+                             randf = rnorm.mod,
+                             means = NULL,
+                             sigmas = NULL,
+                             normalize = TRUE ){
   # Get the dimension of the domain
   dimx = dim( x )
 
@@ -285,15 +295,61 @@ RandomNormalSumField <- function( N,
                                       mean = means[pt],
                                       sd = sigmas[pt] ) )
   }else{
+    # Default value for the mean locations
+    if( is.null( means ) | length( means ) == 1 ){
+      if( length( means ) == 1 ){
+        Nmeans = means
+      }else{
+        Nmeans = ceiling( dimx[1] * 0.3 )
+      }
+
+      means  = x[ seq( 1, dimx[1], length.out = Nmeans ), ]
+      rownames(means) <- NULL
+    }
+
     # Get the dimension of the domain
     dimB   = dim( means )
-    Nmeans = dimB[1]
-    D      = dimB[2]
+    if( is.null( dimB ) ){
+      means = matrix( means, 1, length(means) )
+    }else{
+      Nmeans = dimB[1]
+      D      = dimB[2]
+    }
+
+    if( is.null(Nmeans) ){
+      Nmeans = 1
+      D = length(means)
+      means = matrix( means, 1, D )
+    }
+
+    # Default value for the standard deviations
+    if( is.null( sigmas ) | length(sigmas) == 1 ){
+      if( is.null( sigmas ) ){
+        lambda = 0.001
+      }else{
+        lambda = sigmas
+      }
+
+      # Get the sigmas matrix
+      sigmas = matrix( 0, Nmeans, D^2 )
+
+      # Fill as diagonals depending on dimension
+      sigmas[ , 1 ]   <- rep( 1, Nmeans )
+      sigmas[ , D^2 ] <- rep( 1, Nmeans )
+
+      if( D == 3 ){
+        sigmas[ , 5 ] <- rep( 1, Nmeans )
+      }
+      # Scale the sigma matrix appropriately
+      sigmas = sigmas * diff( range( x ) ) * lambda
+    }
 
     # Get the basis function
     f = vapply( 1:Nmeans,
                 function( l ){
-                   mvtnorm::dmvnorm( x, means[l,], matrix( sigmas[l,], D, D ) )
+                   mvtnorm::dmvnorm( x,
+                                     mean = t( means[l,] ),
+                                     sigma = matrix( sigmas[l,], D, D ) )
                 },
                 FUN.VALUE = seq( 0, pi, length.out = dim( x )[1] )
             )
@@ -327,8 +383,8 @@ RandomNormalSumField <- function( N,
 #' @export
 CosineField <- function( N, x = seq( 0, 1, length.out = 100 ) ){
 
-  samp.field = sin( pi/2 * x ) %*% t( rnorm( N, 0, 1 ) ) +
-               cos( pi/2 * x ) %*% t( rnorm( N, 0, 1 ) )
+  samp.field = sin( pi / 2 * x ) %*% t( rnorm( N, 0, 1 ) ) +
+               cos( pi / 2 * x ) %*% t( rnorm( N, 0, 1 ) )
 
   # Create the output class object
   samp.field = list( values = samp.field,
@@ -359,15 +415,21 @@ KernelSmoothedField <- function( N,
   # Get the dimension of the input coordinates
   dimx = dim( x )
   if( is.null( dimx ) ){
-    Nx = length( x )
+    Nx <- dimx <- length( x )
   }else{
-    D  = dimx[2]
+    # get the grid from the coordinates
+    grid.vals = coords2grid( x )
+    D  = length( grid.vals )
     Nx = dimx[1]
+
+    # Get the dimension of the grid
+    dimx = unlist( lapply( grid.vals, length ) )
   }
 
   # Create the array of noise to be smoothed
-  y = array( randf( dim( x ) * N ), dim = c( dimx, N ) )
+  y = array( randf( Nx, N ), dim = c( dimx, N ) )
 
+  # Create the sample fields by smoothing the noise field
   samp.field = aws::kernsm( y, h = h, kern = kern, unit = unit )
 
   # Create the output class object
