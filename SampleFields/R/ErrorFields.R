@@ -60,6 +60,15 @@ ArbCovProcess <- function( N,
                                                 mu = rep( 0, length( x ) ),
                                                 Sigma = Sigma ) ),
                      locations = x )
+
+  # Add additional important variables to RandomField class
+  samp.field$dim    = dim( samp.field$values )
+  gDim              = getDim( samp.field$locations )
+  samp.field$D      = gDim$D
+  samp.field$nloc   = gDim$nloc
+  samp.field$N      = N
+
+  # Make samp.field a S3 class
   class( samp.field ) = "RandomField"
 
   return( samp.field )
@@ -90,6 +99,15 @@ DegrasNonGaussProcess <- function( N, x = seq( 0, 1, length.out = 100 ) ){
   # Create the output class object
   samp.field = list( values = samp.field,
                      locations = x )
+
+  # Add additional important variables to RandomField class
+  samp.field$dim    = dim( samp.field$values )
+  gDim              = getDim( samp.field$locations )
+  samp.field$D      = gDim$D
+  samp.field$nloc   = gDim$nloc
+  samp.field$N      = N
+
+  # Make samp.field a S3 class
   class( samp.field ) = "RandomField"
 
   return( samp.field )
@@ -135,6 +153,15 @@ OUProcess <- function( N,
   # Create the output class object
   samp.field = list( values = Y,
                      locations = x )
+
+  # Add additional important variables to RandomField class
+  samp.field$dim    = dim( samp.field$values )
+  gDim              = getDim( samp.field$locations )
+  samp.field$D      = gDim$D
+  samp.field$nloc   = gDim$nloc
+  samp.field$N      = N
+
+  # Make samp.field a S3 class
   class( samp.field ) = "RandomField"
 
   return( samp.field )
@@ -183,6 +210,15 @@ RandomBasisSum <- function( N,
   # Create the output class object
   samp.field = list( values =  f %*% randf( nBasis, N ),
                      locations = x )
+
+  # Add additional important variables to RandomField class
+  samp.field$dim    = dim( samp.field$values )
+  gDim              = getDim( samp.field$locations )
+  samp.field$D      = gDim$D
+  samp.field$nloc   = gDim$nloc
+  samp.field$N      = N
+
+  # Make samp.field a S3 class
   class( samp.field ) = "RandomField"
 
   return( samp.field )
@@ -364,6 +400,15 @@ RandomNormalSum <- function( N,
   # Create the output class object
   samp.field = list( values = f %*% randf( Nmeans, N ),
                      locations = x )
+
+  # Add additional important variables to RandomField class
+  samp.field$dim    = dim( samp.field$values )
+  gDim              = getDim( samp.field$locations )
+  samp.field$D      = gDim$D
+  samp.field$nloc   = gDim$nloc
+  samp.field$N      = N
+
+  # Make samp.field a S3 class
   class( samp.field ) = "RandomField"
 
   return( samp.field )
@@ -389,6 +434,15 @@ CosineField <- function( N, x = seq( 0, 1, length.out = 100 ) ){
   # Create the output class object
   samp.field = list( values = samp.field,
                      locations = x )
+
+  # Add additional important variables to RandomField class
+  samp.field$dim    = dim( samp.field$values )
+  gDim              = getDim( samp.field$locations )
+  samp.field$D      = gDim$D
+  samp.field$nloc   = gDim$nloc
+  samp.field$N      = N
+
+  # Make samp.field a S3 class
   class( samp.field ) = "RandomField"
 
   return( samp.field )
@@ -435,6 +489,15 @@ KernelSmoothedField <- function( N,
   # Create the output class object
   samp.field = list( values = samp.field@yhat,
                      locations = x )
+
+  # Add additional important variables to RandomField class
+  samp.field$dim    = dim( samp.field$values )
+  gDim              = getDim( samp.field$locations )
+  samp.field$D      = gDim$D
+  samp.field$nloc   = gDim$nloc
+  samp.field$N      = N
+
+  # Make samp.field a S3 class
   class( samp.field ) = "RandomField"
 
   return( samp.field )
