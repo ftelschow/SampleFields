@@ -16,8 +16,9 @@ Y <- SignalPlusNoise( N = N, x = x )
 plot( Y )
 
 # Default 2D
+x = seq( 0, 2, length.out = 50 )
 x = expand.grid( x, x )
-Y <- SignalPlusNoise( N = N, x = seq( 0, 2, length.out = 200 ) )
+Y <- SignalPlusNoise( N = N, x = x )
 plot( Y )
 plot( Y, surface = TRUE )
 
@@ -31,13 +32,14 @@ Y <- SignalPlusNoise( N = N,
 plot( Y )
 
 # Default 2D with predefined mean and sigma
+x = seq( 0, 2, length.out = 50 )
 x = expand.grid( x, x )
 Y <- SignalPlusNoise( N = N,
                       x = x,
                       mu = mu.prod,
                       sigma = var.example1.2d,
                       obs.noise = 2 )
-plot( Y )
+plot( Y, ncols = 2 )
 plot( Y, surface = TRUE )
 
 
@@ -69,5 +71,5 @@ Y = RandomNormalSum( N = N,
                      normalize = TRUE,
                      means = lx*0.3,
                      sigmas = 0.002 )
-plot( Y )
+plot( Y, ncols = 2 )
 plot( Y, surface = TRUE )
