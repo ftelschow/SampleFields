@@ -114,27 +114,39 @@ plot <- function( x, ... ){
 #'
 #' @return Value of the covariance function evaluated at (x, y).
 #'
-plot.RandomField <- function( rf, surface = FALSE, ... ){
-  if( rf$D == 1 ){
-    rf.tib = sample2tibble( rf$values, rf$locations ) %>% group_by( Sample )
+plot.RandomField <- function( rf, surface = FALSE, xlab = NULL,
+                              ylab = NULL, main = NULL, ncols = 4,... ){
 
-    ggplot( rf.tib ) + geom_line( aes( x = location, y = value, color = Sample ) )
+  if( rf$D == 1 ){
+      rf.tib = sample2tibble( rf$values, rf$locations ) %>% group_by( Sample )
+
+      ggplot( rf.tib ) + geom_line( aes( x = location,
+                                         y = value,
+                                         color = Sample ) )
 
   }else if( rf$D == 2 ){
 
     coords = coords2grid( rf$locations )
+    fig <- list()
 
-    z.vals = matrix( rf$values[,1],
-                     length( coords[[1]] ),
-                     length( coords[[2]] ) )
+    for( k in 1:rf$dim[2] ){
+      tmp = tibble( value = Y$values[,k],
+                    Var1  = Y$locations[,1],
+                    Var2  = Y$locations[,2] )
 
-    fig <- plotly::plot_ly( z = ~ z.vals )
+      fig[[k]] <- ggplot( tmp, aes( Var1, Var2 ) ) +
+                            geom_raster( aes( fill = value ) ) +
+                                labs( x = xlab,
+                                      y = ylab,
+                                      title = main )
 
-    if( surface ){
-      fig <- fig %>% plotly::add_surface()
+      if( surface ){
+        fig[[k]] <- plotly::plot_ly( z = ~ z.vals )
+        fig[[k]] <- fig[[k]] %>% plotly::add_surface()
+      }
     }
 
-    fig
+    multiplot( plotlist = fig, cols = ncols )
 
   }
 }
