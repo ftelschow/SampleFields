@@ -1,0 +1,150 @@
+---
+title: "SampleFields R-package"
+author: "Fabian Telschow"
+date: "01/28/2021"
+output: pdf_document
+---
+
+  ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(fig.width=6, fig.height=3)
+library( SampleFields )
+library( plotly )
+library( tidyverse )
+```
+
+# 1. Some guidelines through the package
+## 1.1. Package dependencies
+At the moment the package depends on the following R-packages:
+
+* aws (developed by Karsten Tabelow and Jörg Pohlzehl): Used for fast smoothing
+to obtain random fields up to dimension 3.
+* tidyverse: mainly to use ggplot
+* plotly: optional for "interactive" ggplots
+
+## 1.2. Design of the package
+The main functions of the package are contained in the file ***DataModels.R***
+currently only the signal-plus-noise model is contained, i.e.,
+$$
+  Y(x) = \mu(x) + \sigma(x) Z(x)\,.
+$$
+Here $\mu(x)$ is the population mean function, $\sigma(x)$ the population
+standard deviation function and $Z$ a random error process. Predefined functions
+for each of these ingredients can be found in the folders ***MeanFunctions.R***,
+***SDFunctions.R*** and ***ErrorFields.R***.
+
+Population mean functions and
+standard deviations can be easily defined as R-functions which take a vector of
+locations as input and output the function values on the input coordinates x.
+Note that locations are assumed to be matrices where ***ROWS*** define the
+coordinates. Default values are that the population mean is zero and the
+standard deviation 1 for all $x$. A simple 1D examples is
+```{r}
+# Sample size
+N = 5
+
+# 1D locations
+x = seq( 0, 2, length.out = 100 )
+
+# define mean function
+mu <- function( x ){
+  3*x
+} 
+
+# Get 10 samples with mean mu, std=1 and Z a default sum of random Gaussians
+Y <- SignalPlusNoise( N = N, x = x, mu = mu )
+
+# plot the sample
+plot( Y )
+```
+
+Similarly in 2D we can produce samples by:
+
+```{r}
+# Sample size
+N = 6
+
+# 1D locations
+x = seq( 0, 2, length.out = 70 )
+# make the vector a grid of 2D coordinates
+x = expand.grid( x, x )
+
+# define mean function
+mu <- function( x ){
+  3*x[,1]*x[,2]
+} 
+
+# Get 10 samples with mean mu, std=1 and Z a default sum of random Gaussians
+Y <- SignalPlusNoise( N = N, x = x, mu = mu )
+
+# plot the sample
+plot( Y, ncols = 2 )
+```
+
+
+## 1.2. RandomField class
+The output of *SignalPlusNoise()* is a class object. I called this class "RandomField". An S3 class is basically a list object. The list contains the follwing entries
+```{r}
+names( Y )
+```
+
+* **values** is a nloc x N matrix containing in each column a realization of the random field.
+* **locations** is the vector/matrix containing the coordinate locations of the random field
+* **dim** contains [nloc, N]
+* **D** is the dimension of the domain
+* **nloc** is the number of locations, i.e., the number of rows in $x$
+* **N** is the number of realizations of the random field.
+
+To implement your own Noise function please look into ***ErrorFields.R*** here you can find examples and how to construct the S3 calss object.
+
+## 1.3. Observation noise
+The signal-plus-noise model allows also to add observation noise.  The corresponding model is
+$$
+  Y(x_i) = \mu(x_i) + \sigma(x_i) Z(x_i) + \epsilon_i\,.
+$$
+Here $x_i$ is an observed location and $\epsilon_i$ is a sample of some distribution. By default this noise is i.i.d. Gaussian with a standard deviation which can be specified.
+
+You can generate samples from this model as follows:
+```{r}
+# Sample size
+N = 5
+
+# 1D locations
+x = seq( 0, 2, length.out = 100 )
+
+# define mean function
+mu <- function( x ){
+  3*x
+} 
+
+# Get 10 samples with mean mu, std=1 and Z a default sum of random Gaussians abd
+# iid Gaussian observation noise with sd = 0.5.
+Y <- SignalPlusNoise( N = N, x = x, mu = mu, obs.noise = 0.5 )
+
+# plot the sample
+plot( Y, main = "Sample with added observation noise" )
+```
+
+If you want to define say depend error processes or observation noise from different distributions you can do it as follows
+```{r}
+# Define a modified sampling function
+rate = 2;
+rexp.mod <- function( N, x ){
+  tmp = getDim( x )
+  return( matrix( rexp( tmp$nloc * N, rate ), tmp$nloc, N ) )
+}
+
+# Get 10 samples with mean mu, std=1 and Z a default sum of random Gaussians abd
+# iid Gaussian observation noise with sd = 0.5.
+Y <- SignalPlusNoise( N = N, x = x, mu = mu, obs.noise = rexp.mod )
+
+# plot the sample
+plot( Y, main = "Sample with added observation noise" )
+```
+
+
+## 1.3. Things to do
+* maybe implement different mean, standard deviation or noise processes
+* some functions need more documentation and an example section would be great.
+* we should discuss what we need for the plotting function and implement it.
+* maybe you have suggestions for better usability.
