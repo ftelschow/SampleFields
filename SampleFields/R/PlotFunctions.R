@@ -122,7 +122,10 @@ plot.RandomField <- function( rf, surface = FALSE, xlab = NULL,
 
       ggplot( rf.tib ) + geom_line( aes( x = location,
                                          y = value,
-                                         color = Sample ) )
+                                         color = Sample ) ) +
+                         labs( x = xlab,
+                               y = ylab,
+                               title = main )
 
   }else if( rf$D == 2 ){
 
