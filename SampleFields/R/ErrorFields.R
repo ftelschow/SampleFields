@@ -8,10 +8,12 @@
 #   - MASS
 #
 # Contained functions:
+#  - Only 1D
 #   - ArbCovProcess
 #   - DegrasNonGaussProcess
 #   - OUProcess
 #
+#  - arbitrary dimension
 #   - RandomBasisSum
 #   - RandomBernsteinSum
 #   - RandomHermiteSum

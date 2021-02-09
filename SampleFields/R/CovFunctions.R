@@ -24,7 +24,10 @@
 #' @return Value of the covariance function evaluated at (x, y).
 #'
 #' @export
-covf.square.exp <- function( x, y, h = 0.01 ){
+covf.square.exp <- function( x, y, h = 0.01, FWHM = FALSE ){
+  if( FWHM ){
+    h = sqrt( 8*log(2) ) * h
+  }
   exp( -( x - y )^2 / 4 / h^2 )
 }
 
