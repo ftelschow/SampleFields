@@ -39,7 +39,8 @@ Y <- SignalPlusNoise( N = N,
                       mu = mu.prod,
                       sigma = var.example1.2d,
                       obs.noise = 2 )
-plot( Y, ncols = 2 )
+fig = plot( Y, ncols = 2 )
+
 plot( Y, surface = TRUE )
 
 
