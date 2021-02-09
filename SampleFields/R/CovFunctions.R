@@ -26,7 +26,7 @@
 #' @export
 covf.square.exp <- function( x, y, h = 0.01, FWHM = FALSE ){
   if( FWHM ){
-    h = sqrt( 8*log(2) ) * h
+    h = h / sqrt( 8*log(2) )
   }
   exp( -( x - y )^2 / 4 / h^2 )
 }
