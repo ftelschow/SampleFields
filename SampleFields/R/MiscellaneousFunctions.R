@@ -87,7 +87,7 @@ getDim <- function( x ){
     nloc = dimx[1]
   }
 
-  #
+  # return a list containing the dimension and number of locations
   return( list( D = D, nloc = nloc ) )
 
 }

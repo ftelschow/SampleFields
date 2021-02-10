@@ -98,21 +98,8 @@ DegrasNonGaussProcess <- function( N, x = seq( 0, 1, length.out = 100 ) ){
                        },
                        FUN.VALUE = rep( 0, length( x ) ) )
 
-  # Create the output class object
-  samp.field = list( values = samp.field,
-                     locations = x )
-
-  # Add additional important variables to RandomField class
-  samp.field$dim    = dim( samp.field$values )
-  gDim              = getDim( samp.field$locations )
-  samp.field$D      = gDim$D
-  samp.field$nloc   = gDim$nloc
-  samp.field$N      = N
-
-  # Make samp.field a S3 class
-  class( samp.field ) = "RandomField"
-
-  return( samp.field )
+  # Return RandomField object
+  return( RandomField( field = samp.field, locations = x ) )
 }
 
 
@@ -152,21 +139,9 @@ OUProcess <- function( N,
                      , FUN.VALUE=1)
   }
 
-  # Create the output class object
-  samp.field = list( values = Y,
-                     locations = x )
 
-  # Add additional important variables to RandomField class
-  samp.field$dim    = dim( samp.field$values )
-  gDim              = getDim( samp.field$locations )
-  samp.field$D      = gDim$D
-  samp.field$nloc   = gDim$nloc
-  samp.field$N      = N
-
-  # Make samp.field a S3 class
-  class( samp.field ) = "RandomField"
-
-  return( samp.field )
+  # Return RandomField object
+  return( RandomField( field = Y, locations = x ) )
 }
 
 
@@ -209,21 +184,8 @@ RandomBasisSum <- function( N,
     f <- f / sqrt( rowSums( f^2 ) )
   }
 
-  # Create the output class object
-  samp.field = list( values =  f %*% randf( nBasis, N ),
-                     locations = x )
-
-  # Add additional important variables to RandomField class
-  samp.field$dim    = dim( samp.field$values )
-  gDim              = getDim( samp.field$locations )
-  samp.field$D      = gDim$D
-  samp.field$nloc   = gDim$nloc
-  samp.field$N      = N
-
-  # Make samp.field a S3 class
-  class( samp.field ) = "RandomField"
-
-  return( samp.field )
+  # Return RandomField object
+  return( RandomField( field = f %*% randf( nBasis, N ), locations = x ) )
 }
 
 
@@ -399,21 +361,8 @@ RandomNormalSum <- function( N,
     f <- f / sqrt( rowSums( f^2 ) )
   }
 
-  # Create the output class object
-  samp.field = list( values = f %*% randf( Nmeans, N ),
-                     locations = x )
-
-  # Add additional important variables to RandomField class
-  samp.field$dim    = dim( samp.field$values )
-  gDim              = getDim( samp.field$locations )
-  samp.field$D      = gDim$D
-  samp.field$nloc   = gDim$nloc
-  samp.field$N      = N
-
-  # Make samp.field a S3 class
-  class( samp.field ) = "RandomField"
-
-  return( samp.field )
+  # Return RandomField object
+  return( RandomField( field = f %*% randf( Nmeans, N ), locations = x ) )
 
 }
 
@@ -433,21 +382,8 @@ CosineField <- function( N, x = seq( 0, 1, length.out = 100 ) ){
   samp.field = sin( pi / 2 * x ) %*% t( rnorm( N, 0, 1 ) ) +
                cos( pi / 2 * x ) %*% t( rnorm( N, 0, 1 ) )
 
-  # Create the output class object
-  samp.field = list( values = samp.field,
-                     locations = x )
-
-  # Add additional important variables to RandomField class
-  samp.field$dim    = dim( samp.field$values )
-  gDim              = getDim( samp.field$locations )
-  samp.field$D      = gDim$D
-  samp.field$nloc   = gDim$nloc
-  samp.field$N      = N
-
-  # Make samp.field a S3 class
-  class( samp.field ) = "RandomField"
-
-  return( samp.field )
+  # Return RandomField object
+  return( RandomField( field = samp.field, locations = x ) )
 
 }
 
@@ -488,21 +424,8 @@ KernelSmoothedField <- function( N,
   # Create the sample fields by smoothing the noise field
   samp.field = aws::kernsm( y, h = h, kern = kern, unit = unit )
 
-  # Create the output class object
-  samp.field = list( values = samp.field@yhat,
-                     locations = x )
-
-  # Add additional important variables to RandomField class
-  samp.field$dim    = dim( samp.field$values )
-  gDim              = getDim( samp.field$locations )
-  samp.field$D      = gDim$D
-  samp.field$nloc   = gDim$nloc
-  samp.field$N      = N
-
-  # Make samp.field a S3 class
-  class( samp.field ) = "RandomField"
-
-  return( samp.field )
+  # Return RandomField object
+  return( RandomField( field = samp.field@yhat, locations = x ) )
 
 }
 
