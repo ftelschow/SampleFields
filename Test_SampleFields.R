@@ -13,6 +13,7 @@ N = 10
 # Default 1D
 x = seq( 0, 2, length.out = 100 )
 Y <- SignalPlusNoise( N = N, x = x )
+Y2 <- SignalPlusNoise( N = N, x = x )
 plot( Y )
 
 # Default 2D
@@ -64,13 +65,13 @@ plot( Y )
 
 
 # 2D RandomNormalSum
-x  = seq( 0, 1, length.out = 50 )
+x  = seq( 0, 1, length.out = 100 )
 grid = expand.grid(x,x)
 lx = dim(grid)[1]
-Y = RandomNormalSum( N = N,
-                     expand.grid(x,x),
+Y = RandomNormalSum( N = 4,
+                     x = grid,
                      normalize = TRUE,
                      means = lx*0.3,
-                     sigmas = 0.002 )
+                     sigmas = 0.004 )
 plot( Y, ncols = 2 )
 plot( Y, surface = TRUE )
