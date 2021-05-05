@@ -95,14 +95,17 @@ names( Y )
 * **nloc** is the number of locations, i.e., the number of rows in $x$
 * **N** is the number of realizations of the random field.
 
-To implement your own Noise function please look into ***ErrorFields.R*** here you can find examples and how to construct the S3 calss object.
+To implement your own Noise function please look into ***ErrorFields.R*** here
+you can find examples and how to construct the S3 calss object.
 
 ## 1.3. Observation noise
 The signal-plus-noise model allows also to add observation noise.  The corresponding model is
 $$
   Y(x_i) = \mu(x_i) + \sigma(x_i) Z(x_i) + \epsilon_i\,.
 $$
-Here $x_i$ is an observed location and $\epsilon_i$ is a sample of some distribution. By default this noise is i.i.d. Gaussian with a standard deviation which can be specified.
+Here $x_i$ is an observed location and $\epsilon_i$ is a sample of some
+distribution. By default this noise is i.i.d. Gaussian with a standard
+deviation which can be specified.
 
 You can generate samples from this model as follows:
 ```{r}
@@ -125,7 +128,8 @@ Y <- SignalPlusNoise( N = N, x = x, mu = mu, obs.noise = 0.5 )
 plot( Y, main = "Sample with added observation noise" )
 ```
 
-If you want to define say depend error processes or observation noise from different distributions you can do it as follows
+If you want to define say depend error processes or observation noise from
+different distributions you can do it as follows
 ```{r}
 # Define a modified sampling function
 rate = 2;
