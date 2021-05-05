@@ -88,20 +88,20 @@ multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
   }
 }
 
-#' Covariance function: Square exponential
-#'
-#' This implements the square exponential covariance function, i.e.,
-#' *c( x, y ) = exp( -( x - y )^2 / 4 / h^2 )*
-#'
-#' @param x Numeric. First argument of cov( x, y ).
-#' @param y Numeric. First argument of cov( x, y ).
-#' @param h Numeric. Scaling parameter.
-#'
-#' @return Value of the covariance function evaluated at (x, y).
-#'
-plot <- function( x, ... ){
-  UseMethod( "plot" )
-}
+#' #' Covariance function: Square exponential
+#' #'
+#' #' This implements the square exponential covariance function, i.e.,
+#' #' *c( x, y ) = exp( -( x - y )^2 / 4 / h^2 )*
+#' #'
+#' #' @param x Numeric. First argument of cov( x, y ).
+#' #' @param y Numeric. First argument of cov( x, y ).
+#' #' @param h Numeric. Scaling parameter.
+#' #'
+#' #' @return Value of the covariance function evaluated at (x, y).
+#' #'
+#' plot <- function( x, ... ){
+#'   UseMethod( "plot" )
+#' }
 
 #' Covariance function: Square exponential
 #'
@@ -114,8 +114,9 @@ plot <- function( x, ... ){
 #'
 #' @return Value of the covariance function evaluated at (x, y).
 #'
-plot.RandomField <- function( rf, surface = FALSE, xlab = NULL,
-                              ylab = NULL, main = NULL, ncols = 4,... ){
+plot_RF <- function( rf, surface = FALSE, xlab = NULL,
+                              ylab = NULL, main = NULL, ncols = 4,
+                              legend.pos = "none", ... ){
 
   if( rf$D == 1 ){
       rf.tib = sample2tibble( rf$values, rf$locations ) %>% group_by( Sample )
@@ -125,7 +126,8 @@ plot.RandomField <- function( rf, surface = FALSE, xlab = NULL,
                                          color = Sample ) ) +
                          labs( x = xlab,
                                y = ylab,
-                               title = main )
+                               title = main ) +
+                         theme( legend.position = legend.pos )
 
   }else if( rf$D == 2 ){
 

@@ -125,7 +125,7 @@ chi2_Field <- function( N,
   # Loop over number of samples
   for( n in 1:N ){
     # get df independent samples
-    Y = SignalPlusNoise( N = df, x = x, mu = mu, noise = RandomNormalSum,
+    Y = SignalPlusNoise( N = df, x = x, mu = mu, noise = noise,
                          sigma = sigma, obs.noise = obs.noise, ... )
     # Compute the chi2 field from the sample
     values[,n] = rowSums( Y$values^2 )
@@ -170,7 +170,7 @@ t_Field <- function( N,
   # Loop over number of samples
   for( n in 1:N ){
     # get df independent samples
-    Y = SignalPlusNoise( N = df+1, x = x, mu = mu, noise = RandomNormalSum,
+    Y = SignalPlusNoise( N = df+1, x = x, mu = mu, noise = noise,
                          sigma = sigma, obs.noise = obs.noise, ... )
     # Compute the t field from the sample
     values[,n] = sqrt( df ) * Y$values[,1] / sqrt( rowSums( Y$values[,-1]^2 ) )
@@ -214,9 +214,9 @@ F_Field <- function( N,
   # Loop over number of samples
   for( n in 1:N ){
     # get df independent samples
-    Y1 = SignalPlusNoise( N = df[1], x = x, mu = mu, noise = RandomNormalSum,
+    Y1 = SignalPlusNoise( N = df[1], x = x, mu = mu, noise = noise,
                           sigma = sigma, obs.noise = obs.noise, ... )
-    Y2 = SignalPlusNoise( N = df[2], x = x, mu = mu, noise = RandomNormalSum,
+    Y2 = SignalPlusNoise( N = df[2], x = x, mu = mu, noise = noise,
                           sigma = sigma, obs.noise = obs.noise, ... )
     # Compute the t field from the sample
     values[,n] = df[2] / df[1] * rowSums( Y1$values^2 ) / rowSums( Y2$values^2 )
