@@ -77,7 +77,8 @@ ArbCovProcess <- function( N,
 }
 
 
-#' Samples from a Non-Gaussian process used in Degras(2011)
+#' Samples from a Non-Gaussian process used in Degras(2011). The only difference
+#' is that we scaled the process to have variance 1 at each location.
 #'
 #' Creates sample paths from a 1D non Gaussian field as used in Degras
 #' (2011, Simultaneous confidence bands for nonparametric regression with
@@ -99,7 +100,8 @@ DegrasNonGaussProcess <- function( N, x = seq( 0, 1, length.out = 100 ) ){
                        FUN.VALUE = rep( 0, length( x ) ) )
 
   # Return RandomField object
-  return( RandomField( field = samp.field, locations = x ) )
+  return( RandomField( field = samp.field / sqrt(sin(pi * x)^2 / 9 + 2 / 3 * (x - 0.5)),
+                       locations = x ) )
 }
 
 
