@@ -100,7 +100,7 @@ DegrasNonGaussProcess <- function( N, x = seq( 0, 1, length.out = 100 ) ){
                        FUN.VALUE = rep( 0, length( x ) ) )
 
   # Return RandomField object
-  return( RandomField( field = samp.field / sqrt(sin(pi * x)^2 / 9 + 2 / 3 * (x - 0.5)),
+  return( RandomField( field = samp.field / sqrt(sin(pi * x)^2 / 9 + 4 / 9 * (x - 0.5)^2),
                        locations = x ) )
 }
 
