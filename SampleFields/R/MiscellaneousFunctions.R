@@ -91,3 +91,36 @@ getDim <- function( x ){
   return( list( D = D, nloc = nloc ) )
 
 }
+
+
+#' Symmetric matrix from vector
+#'
+#' This function takes a T x D matrix of coordinates and checks whether the
+#' points lie on a regular grid. If so it outputs the coordinate vectors for the
+#' grid.
+#'
+#' @param x Matrix of dimension T x D containing coordinates. D > 1 required.
+#'
+#' @return list containing the coordinates in each direction.
+#'
+Vec2SymMatrix <- function( v ){
+  mat <- matrix(0, nrow = length(v) - 1, ncol = length(v) - 3)
+  mat[upper.tri(mat, diag = TRUE)] <- v
+  mat[lower.tri(mat, diag = TRUE)] <- v
+
+  # Get the dimension of x
+  dimx <- dim( x )
+
+  #
+  if( is.null( dimx ) ){
+    D    = 1
+    nloc = length( x )
+  }else{
+    D    = dimx[2]
+    nloc = dimx[1]
+  }
+
+  # return a list containing the dimension and number of locations
+  return( list( D = D, nloc = nloc ) )
+
+}

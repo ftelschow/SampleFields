@@ -116,14 +116,14 @@ multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
 #'
 plot_RF <- function( rf, surface = FALSE, xlab = NULL,
                               ylab = NULL, main = NULL, ncols = 4,
-                              legend.pos = "none", ... ){
+                              legend.pos = "none", size.line = 1, ... ){
 
   if( rf$D == 1 ){
       rf.tib = sample2tibble( rf$values, rf$locations ) %>% group_by( Sample )
 
       ggplot( rf.tib ) + geom_line( aes( x = location,
                                          y = value,
-                                         color = Sample ) ) +
+                                         color = Sample ), size = size.line ) +
                          labs( x = xlab,
                                y = ylab,
                                title = main ) +
