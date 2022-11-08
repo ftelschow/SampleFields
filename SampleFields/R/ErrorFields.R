@@ -76,6 +76,48 @@ ArbCovProcess <- function( N,
   return( samp.field )
 }
 
+#' Creates sample paths from a 1D random field having at each location an
+#' iid sample from a pre-defined probability distribution.
+#' The default is a standard zero-mean, unit-variance Gaussian.
+#'
+#' @param N Integer amount of realisations of the random field to be generated.
+#' @param x Vector locations at which the random process is evaluated.
+#' @param rdistr Function computing random samples from a distribution. Note
+#' that the function must have an paramter "n" for the sample size drawn from
+#' this distribution.
+#' @param ... additional arguments to rdistr
+#' @return RandomField class object containing the realisations of the random
+#' field and the locations.
+#'
+#' @export
+IIDProcess <- function( N,
+                        x = seq( 0, 1, length.out = 100 ),
+                        rdistr = rnorm, ...
+){
+  # Get the covariance matrix
+  lx = length(x)
+
+  # Obtain the values of the field
+  fieldValues = matrix(rdistr(n = N * lx, ...), lx, N)
+
+  # Simulate realizations from the Gaussian process with the given covariance
+  # function and output as RandomField object
+  samp.field = list( values    = fieldValues,
+                     locations = x )
+
+  # Add additional important variables to RandomField class
+  samp.field$dim    = dim( samp.field$values )
+  gDim              = getDim( samp.field$locations )
+  samp.field$D      = gDim$D
+  samp.field$nloc   = gDim$nloc
+  samp.field$N      = N
+
+  # Make samp.field a S3 class
+  class( samp.field ) = "RandomField"
+
+  return( samp.field )
+}
+
 
 #' Samples from a Non-Gaussian process used in Degras(2011). The only difference
 #' is that we scaled the process to have variance 1 at each location.
@@ -175,8 +217,19 @@ RandomBasisSum <- function( N,
                             basisf,
                             randf = rnorm.mod,
                             normalize = TRUE ){
-  # Get the basis functions evaluated on x.
-  f <- basisf( x )
+  if(is.function(basisf)){
+    # Get the basis functions evaluated on x.
+    f <- basisf(x)
+  }else if(is.array(basisf)){
+    if(dim(basisf)[1] == length(x)){
+      f <- basisf
+    }else{
+      stop("If basisf is an array it needs to have length(x) rows!")
+    }
+  }else{
+    stop("basisf needs to be either a function or an array with length(x) rows!")
+  }
+
   # Get the number of basis functions
   nBasis <- dim( f )[2]
 
