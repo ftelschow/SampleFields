@@ -284,12 +284,15 @@ RandomBernsteinSum <- function( N,
 #'
 #' @inheritParams RandomBasisSum
 #' @inherit RandomBasisSum return
+#' @param nbasis a vector containing the number of hermite polynomials used
+#'
 #'
 #' @export
 RandomHermiteSum <- function( N,
                               x = seq( 0, 1, length.out = 100 ),
                               randf = rnorm.mod,
-                              normalize = TRUE ){
+                              normalize = TRUE,
+                              nbasis = 1:11){
 
   # define the basis functions as Hermite polynomials
   basisf <- function( x ){ cbind( 1,
@@ -297,7 +300,20 @@ RandomHermiteSum <- function( N,
                                   4 * ( 3 * x )^2 - 2,
                                   8 * ( 3 * x )^3 - 12 * ( 3 * x ),
                                   16 * ( 3 * x )^4 - 48 * ( 3 * x)^2 + 12 )
-                        }
+  }
+  basisf <- function( x ){ A= cbind( 1,
+                                  x,
+                                  x^2  - 1,
+                                  x^3  - 3*x,
+                                  x^4  - 6*x^2 + 3,
+                                  x^5  - 10*x^3 + 15*x,
+                                  x^6  - 15*x^4 + 45*x^2 - 15,
+                                  x^7  - 21*x^5 + 105*x^3 -105*x,
+                                  x^8  - 28*x^6 + 210*x^4 - 420*x^2 + 105,
+                                  x^9  - 36*x^7 + 378*x^5 - 1260*x^3 + 945*x,
+                                  x^10 - 45*x^8 + 630*x^6 - 4150*x^4 + 4724*x^2 - 945)
+    return(A[, nbasis])
+  }
 
   # Output a random linear combination of the first 6 Bernstein polynomials
   RandomBasisSum( N = N,
