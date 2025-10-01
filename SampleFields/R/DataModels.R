@@ -16,7 +16,7 @@
 #' Generate Samples from Signal-plus-Noise Model
 #'
 #' SignalPlusNoise() returns samples from a signal-plus-noise model
-#' $$ Y(x) = \mu(x) + \sigma(x) Z(x) $$
+#' $$ Y(x) = mu(x) + sigma(x) Z(x) $$
 #' are computed.
 #' The population mean, variance, error field and observation noise can be
 #' seperately defined as functions or predefined functions from this package
