@@ -114,20 +114,45 @@ multiplot <- function(..., plotlist = NULL, file, cols = 1, layout = NULL) {
 #'
 #' @return Value of the covariance function evaluated at (x, y).
 #'
+#'
+#' @export
 plot_RF <- function( rf, surface = FALSE, xlab = NULL,
                               ylab = NULL, main = NULL, ncols = 4,
-                              legend.pos = "none", size.line = 1, ... ){
+                              legend.pos = "none",
+                              ylims = NULL, size.line = 1,
+                              axis_size = c(18, 18),
+                              axis_label_size = c(18,18),
+                              greyscale = FALSE,... ){
 
   if( rf$D == 1 ){
-      rf.tib = sample2tibble( rf$values, rf$locations ) %>% group_by( Sample )
+    library(extrafont)
+    loadfonts()
+      rf.tib = sample2tibble( Y = rf$values, x = rf$locations ) %>% group_by( Sample )
 
-      ggplot( rf.tib ) + geom_line( aes( x = location,
+      pp = ggplot( rf.tib ) + geom_line( aes( x = location,
                                          y = value,
                                          color = Sample ), size = size.line ) +
                          labs( x = xlab,
                                y = ylab,
                                title = main ) +
-                         theme( legend.position = legend.pos )
+                          ylim(ylims)
+      if(greyscale){
+        pp = pp + scale_colour_grey() +
+              theme( legend.position = legend.pos,
+                     panel.background = element_rect(fill='white', colour='black'),
+                        axis.text.x = element_text(size = axis_size[1], family="LM Roman 10"),
+                        axis.text.y = element_text(size = axis_size[2], family="LM Roman 10"),
+                        axis.title.x = element_text(size = axis_label_size[1]),
+                        axis.title.y = element_text(size = axis_label_size[2]))
+      }else{
+        pp = pp +
+          theme( legend.position = legend.pos,
+                 axis.text.x = element_text(size = axis_size[1], family="LM Roman 10"),
+                 axis.text.y = element_text(size = axis_size[2], family="LM Roman 10"),
+                 axis.title.x = element_text(size = axis_label_size[1]),
+                 axis.title.y = element_text(size = axis_label_size[2]))
+      }
+      pp
 
   }else if( rf$D == 2 ){
 

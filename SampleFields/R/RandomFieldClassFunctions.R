@@ -13,7 +13,35 @@
 # -
 # -
 #------------------------------------------------------------------------------#
+#' Regular grid from coordinates
+#'
+#' This function takes a T x D matrix of coordinates and checks whether the
+#' points lie on a regular grid. If so it outputs the coordinate vectors for the
+#' grid.
+#'
+#' @param x Matrix of dimension T x D containing coordinates. D > 1 required.
+#'
+#' @return list containing the coordinates in each direction.
+#'
+#'
+#' @export
+getDim <- function( x ){
+  # Get the dimension of x
+  dimx <- dim( x )
 
+  #
+  if( is.null( dimx ) ){
+    D    = 1
+    nloc = length( x )
+  }else{
+    D    = dimx[2]
+    nloc = dimx[1]
+  }
+
+  # return a list containing the dimension and number of locations
+  return( list( D = D, nloc = nloc ) )
+
+}
 #' RandomField constructs an object of class RandomField from input data
 #'
 #' Function computing the population mean curve. The function is

@@ -46,7 +46,7 @@ var.example1.2d <- function( x = expand.grid( seq( 0, 1, length.out = 50 ),
                              h = 1 ){
 
   if( dim( x )[2] != 2 ){
-    break( "Error, this function requires x to be a Tx2 matrix." )
+    stop( "Error, this function requires x to be a Tx2 matrix." )
   }
 
   # compute the variance function
