@@ -4,7 +4,7 @@ Title: Generation of Random Fields up to Dimension 3
 Version: 0.1.0
 Date: 2020-01-15
 Imports: abind (>= 1.4-3), matrixStats (>= 0.57.0),
-  MASS (>= 7.3-53), spatstat (>= 1.64-1)
+  MASS (>= 7.3-53)
 Author: Fabian JE Telschow [aut, cre]
 Maintainer: Fabian JE Telschow <ftelschow@math.hu.de>
 Description: This package implements different functions to obtain samples from
